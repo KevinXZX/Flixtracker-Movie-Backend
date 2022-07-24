@@ -2,9 +2,6 @@ import Movie from './Movie'
 import Grid from '@mui/material/Grid'
 import React from "react";
 const Movies = ({movies, start,title}) => {
-    const check = async () => {
-        alert(JSON.stringify(movies))
-      }
     return (
         <div className='box'>
         <h1 className='listTitle'>{title}</h1>

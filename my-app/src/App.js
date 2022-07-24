@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes,useParams,Switch,withRouter } from 'react-router-dom'
 import Movies from './components/Movies'
-import { AppBar } from '@mui/material';
 import React from "react";
+import MoviePage from './components/MoviePage'
 
 
 
 const App = () => {
   const [topMovies, setTopMovie] = useState([])
   const [upcomingMovies, setUpcoming] = useState([])
+  let { id } = useParams();
   useEffect(() => {
     fetchPopular()
     fetchUpcoming()
@@ -37,6 +38,7 @@ const App = () => {
   return (
     <Router>
       <div className='container'>
+      <Header></Header>
         <Routes>
           <Route
             path='/'
@@ -44,7 +46,6 @@ const App = () => {
               <>
               
               <div>
-              <Header></Header>
               <Movies movies={topMovies}
               start={0} title={"Popular"}
               />
@@ -57,10 +58,33 @@ const App = () => {
               </>
             }
           />
+          <Route
+            path='/movies/:id'
+            element={
+              <>
+              <MoviePage ida={{id}}/>
+              </>
+            }
+            
+            // children={<Child />}
+          />
         </Routes>
+        
       </div>
     </Router>
   )
+  function Child() {
+    // We can use the `useParams` hook here to access
+    // the dynamic pieces of the URL.
+    let { id } = useParams();
+  
+    return (
+      <div>
+        <h3>ID: {id}</h3>
+      </div>
+    );
+  }
+  
 }
 
 export default App
