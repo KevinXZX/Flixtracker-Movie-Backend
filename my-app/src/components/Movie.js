@@ -14,7 +14,10 @@ const Movie = ({movie}) => {
       <Grid item xs={2} className="img-container">
         <div className="img-container" onClick={()=>moveToMovie(movie.id)}>
           <img src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} alt = "movie_img" />
-          <div className='img-text'>{movie.original_title}</div>
+          <div className='img-text'>
+            {movie.original_title}
+            {/* <div className='img-summary'>{movie.overview}</div> */}
+          </div>
         </div>
       </Grid>
     )

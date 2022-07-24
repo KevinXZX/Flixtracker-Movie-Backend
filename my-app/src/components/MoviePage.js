@@ -36,19 +36,23 @@ const MoviePage = (ida) => {
     if(typeof movieDetails.revenue === 'undefined'){
       return <></>
     }else{
+      var mins = movieDetails.runtime
+      var hrs = parseInt(movieDetails.runtime/60)
+      mins = mins - 60 *hrs
     return (
       <>
-      <Container className='wrapper-box' maxWidth="sm" >
+      <Container className='wrapper-box' maxWidth="false">
       <h3 style={{marginBottom:'3px'}}>{movieDetails.original_title}</h3>
-      <Container disableGutters  className='movie-detailed-box' maxWidth="sm" sx={{ display: 'flex'}}>
-        <Stack spacing={0}>
+      <hr></hr>
+      <Container disableGutters  className='movie-detailed-box' maxWidth="false" sx={{ display: 'flex', marginLeft:'1%',width:'100%'}}>
+        <Stack spacing={0} style={{marginBottom:'3px'}}>
         <img src={`https://image.tmdb.org/t/p/original${movieDetails.poster_path}`} alt = "movie_img" />
         <h4 style={{margin:'3px'}}>
           Information
         </h4>
         <hr></hr>
         <div>
-          <b>Runtime: </b>{movieDetails.runtime}m
+          <b>Runtime: </b>{hrs}hrs {mins}mins
         </div>
         <div>
           <b>Release Date: </b>{movieDetails.release_date}
@@ -58,15 +62,28 @@ const MoviePage = (ida) => {
         </div>
         <div>
           <b>Producers: </b>
-          {movieDetails.production_companies.map((producer, index) => (
-            <>{producer.name}</>
+          {movieDetails.production_companies.map((producer, index,arr) => (
+            index===arr.length-1? <>{producer.name}</> :<>{producer.name}, </>
+          ))}
+        </div>
+        <div>
+          <b>Genres: </b>
+          {movieDetails.genres.map((genres, index,arr) => (
+            index===arr.length-1? <>{genres.name}</> :<>{genres.name}, </>
           ))}
         </div>
 
         </Stack>
         
-        <Stack spacing={0} style={{marginLeft:'10px'}}>
-          <h4>
+        <Stack spacing={0} style={{marginLeft:'5%'}}>
+          <h4 style={{marginBottom:'3px'}}>
+          Synposis
+          </h4>
+          <hr></hr>
+          <div className='info'>
+          {movieDetails.overview}
+          </div>
+          <h4 style={{marginBottom:'3px'}}>
           Synposis
           </h4>
           <hr></hr>
