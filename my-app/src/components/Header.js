@@ -9,11 +9,12 @@ import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import { useNavigate } from "react-router-dom";
-import MenuIcon from '@mui/icons-material/Menu';
+import { InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { createMuiTheme } from '@mui/material/styles';
 import { color, height } from '@mui/system';
+
 const muiTheme = createMuiTheme({});
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -31,40 +32,34 @@ const Search = styled('div')(({ theme }) => ({
 }));
 
 const StyledAutocomplete = styled(Autocomplete)({
-  color:'white'
+  color:'white',
+  width:'300',
+  "& .MuiAutocomplete-inputRoot": {
+    color: "white",
+    width:300,
+  },
+  ".MuiAutocomplete-root":{
+    color:"white",
+    backgroundColor:"white"
+  },
+  ".MuiAutocomplete-groupLabel":{
+    color:"white"
+  },
+  ".css-q0fu5":{
+    color:"white"
+  }
 });
 
   //doesnt work right now auto complete is 
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 1),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
-      },
-    },
-  }));
+  const CssTextField = styled(TextField)({
+    color:'white'
+  });
 const Header = () => {
+    
     const [searchResult, setResult] = useState([]) 
     const fetchSearch = async (e,value) => {
         e.preventDefault()
+        console.log(3)
         fetch('https://api.themoviedb.org/3/search/movie?api_key=0cec67fe43f9191296e8cb82c2303e20&language=en-US&page=1&include_adult=false&query='+e.target.value)
         .then(response => {
         return response.json()
@@ -81,6 +76,9 @@ const Header = () => {
     const moveHome = () =>{
       navigate("/")
     }
+    const moveToMovie = (id) =>{
+      navigate("/movies/"+id)
+    }
     return (
         <AppBar position="relative"  style={{display: 'flex',background: 'black',width:'100%', height:'6vh', overflow:'visible'}}>
         <Toolbar variant="dense" color="black">
@@ -89,9 +87,9 @@ const Header = () => {
           </Typography>
           <div className = "search">
           <Search>
-            <SearchIconWrapper style={{position: 'absolute',left:'0.0005vw',top:'0px'}}>
+            {/* <SearchIconWrapper style={{position: 'absolute',left:'0.0005vw',top:'0px'}}>
               <SearchIcon />
-            </SearchIconWrapper>
+            </SearchIconWrapper> */}
                 {/* <StyledInputBase id = "searchField"
                   placeholder="Search…"
                   inputProps={{ 'aria-label': 'search' }}
@@ -99,18 +97,25 @@ const Header = () => {
                       fetchSearch
                   }
               /> */
-              <Autocomplete id = "searchField"
+              <StyledAutocomplete id = "searchField"
                   // placeholder="Search…"
-                  inputProps={{ 'aria-label': 'search' }}
-                  sx={{width:'100px', color:'white'}}
+                  inputProps={{ 'aria-label': 'search', startAdornment: ( <InputAdornment position="start"> <SearchIcon /> 
+                  </InputAdornment> )}}
                   size='small'
                   options={searchResult}
                   onInputChange={
-                      fetchSearch
+                    fetchSearch
                   }
                   getOptionLabel={(option) =>option.title || ""}
-                  renderOption={(props, option) => <li {...props}>{option.title}</li>}
-                  renderInput={(params) => <TextField style={{color:'white'}}{...params} label="Search Movies" />}
+                  renderOption={(props, option) => <li {...props} onClick={()=>moveToMovie(option.id)}>{option.title}</li>}
+                  // renderInput={(params) => <TextField style={{color:'white'}}{...params} label="Search Movies" />}
+                  blurOnSelect={true}
+                  renderInput={(params) => <TextField {...params} InputProps={{
+                    ...params.InputProps,
+                    startAdornment: ( <InputAdornment position="start"> <SearchIcon /> 
+                    </InputAdornment> ), //this breaks options somehow
+                }} label="Search Movies" style={{color:'white'}}   />}
+                  
               /> 
               
               }
