@@ -4,6 +4,7 @@ import { Autocomplete } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
@@ -12,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { createMuiTheme } from '@mui/material/styles';
+import { color, height } from '@mui/system';
 const muiTheme = createMuiTheme({});
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -27,6 +29,10 @@ const Search = styled('div')(({ theme }) => ({
       width: 'auto',
     },
 }));
+
+const StyledAutocomplete = styled(Autocomplete)({
+  color:'white'
+});
 
   //doesnt work right now auto complete is 
   const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -57,15 +63,18 @@ const Search = styled('div')(({ theme }) => ({
   }));
 const Header = () => {
     const [searchResult, setResult] = useState([]) 
-    const fetchSearch = async (e) => {
+    const fetchSearch = async (e,value) => {
         e.preventDefault()
         fetch('https://api.themoviedb.org/3/search/movie?api_key=0cec67fe43f9191296e8cb82c2303e20&language=en-US&page=1&include_adult=false&query='+e.target.value)
         .then(response => {
         return response.json()
         })
         .then(data => {
-            //alert(JSON.stringify(data))
-            setResult(data.results)
+          if(data.results === undefined){
+            setResult([])
+          }else{
+            setResult((data.results))
+          }
         })
     } //still gotta use autocomplete spend some time figuring it out
     const navigate = useNavigate();
@@ -73,9 +82,9 @@ const Header = () => {
       navigate("/")
     }
     return (
-        <AppBar position="relative"  style={{background: 'black', height:'8vh', overflow:'visible'}}>
+        <AppBar position="relative"  style={{display: 'flex',background: 'black',width:'100%', height:'6vh', overflow:'visible'}}>
         <Toolbar variant="dense" color="black">
-          <Typography variant="h6" color="inherit" component="div" onClick={()=>moveHome()}>
+          <Typography variant="h6" sx="" color="inherit" component="div" onClick={()=>moveHome()}>
             FlixTracker
           </Typography>
           <div className = "search">
@@ -83,13 +92,28 @@ const Header = () => {
             <SearchIconWrapper style={{position: 'absolute',left:'0.0005vw',top:'0px'}}>
               <SearchIcon />
             </SearchIconWrapper>
-                <StyledInputBase id = "searchField"
+                {/* <StyledInputBase id = "searchField"
                   placeholder="Search…"
                   inputProps={{ 'aria-label': 'search' }}
                   onChange={
                       fetchSearch
                   }
-              />
+              /> */
+              <Autocomplete id = "searchField"
+                  // placeholder="Search…"
+                  inputProps={{ 'aria-label': 'search' }}
+                  sx={{width:'100px', color:'white'}}
+                  size='small'
+                  options={searchResult}
+                  onInputChange={
+                      fetchSearch
+                  }
+                  getOptionLabel={(option) =>option.title || ""}
+                  renderOption={(props, option) => <li {...props}>{option.title}</li>}
+                  renderInput={(params) => <TextField style={{color:'white'}}{...params} label="Search Movies" />}
+              /> 
+              
+              }
           </Search>
                     
           </div>
