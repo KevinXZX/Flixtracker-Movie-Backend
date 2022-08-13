@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
-@RequestMapping("/api/v1/public")
+@RequestMapping("/api/v1/")
 public class ResourceController {
     private static final String template = "Hello, %s!";
+    private static final String FAILED_AUTH_ERROR = "{\"response\":\"incorrect_access_token\"}";
     private final AtomicLong counter = new AtomicLong();
     @Autowired
     UserService userService;
@@ -17,12 +18,25 @@ public class ResourceController {
     UserRepo userRepo;
 
     @PostMapping("/user/register")
-    public ResponseEntity<Object> greeting(@RequestBody User newUser) {
+    public ResponseEntity<Object> register(@RequestBody User newUser) {
         return userService.register(newUser);
+    }
+
+    @GetMapping("/user/login")
+    public ResponseEntity<Object> login(@RequestBody User user) {
+        return userService.login(user);
     }
     @GetMapping("/greeting")
     public ResponseEntity<Object> greeting() {
         return ResponseEntity.ok().body("Hello");
+    }
+    @GetMapping("/user/welcome")
+    public ResponseEntity<Object> authenticatedGreeting(@RequestBody AuthRequest authRequest) {
+        System.out.println("Attempting Auth with "+authRequest.getEmail()+" : "+authRequest.getAuthToken());
+        if(userService.verifyToken(authRequest.getEmail(), authRequest.getAuthToken())){
+            return ResponseEntity.ok().body("{\"response\":\"authenticated\"}");
+        }
+        return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
     }
 //    @PutMapping("/user")
 //    public ResponseEntity<Object>
