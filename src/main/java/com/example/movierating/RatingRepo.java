@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface RatingRepo extends JpaRepository<MovieRating, Integer> {
-
+    List<MovieRating> findByMovieIdAndUserId(String movie_id, int user_id);
 }

@@ -41,7 +41,7 @@ public class UserService {
         if(userRepo.findByEmail(userEntry.getEmail()).isEmpty()){
             return ResponseEntity.status(404).body("Account does not exist");
         }
-        String correctPassword = userRepo.findByEmail(userEntry.getEmail()).get(0).getPassword();
+        final String correctPassword = userRepo.findByEmail(userEntry.getEmail()).get(0).getPassword();
         if(encoder.matches(userEntry.getPassword(), correctPassword) ){
             byte[] randomBytes = new byte[64];
             secureRandom.nextBytes(randomBytes);
@@ -52,7 +52,6 @@ public class UserService {
     }
 
     public boolean verifyToken(String email, String token){
-        System.out.println("Checking Token");
         return tokenInMemoryRepo.verifyToken(email,token);
     }
 

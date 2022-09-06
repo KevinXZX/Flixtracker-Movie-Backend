@@ -13,9 +13,13 @@ public class ResourceController {
     private static final String FAILED_AUTH_ERROR = "{\"response\":\"incorrect_access_token\"}";
     private final AtomicLong counter = new AtomicLong();
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    UserRepo userRepo;
+    private RatingService ratingService;
+    @Autowired
+    private UserRepo userRepo;
+    @Autowired
+    private RatingRepo ratingRepo;
 
     @PostMapping("/user/register")
     public ResponseEntity<Object> register(@RequestBody UserEntry newUserEntry) {
@@ -32,9 +36,16 @@ public class ResourceController {
     }
     @GetMapping("/user/welcome")
     public ResponseEntity<Object> authenticatedGreeting(@RequestBody AuthRequest authRequest) {
-        System.out.println("Attempting Auth with "+authRequest.getEmail()+" : "+authRequest.getAuthToken());
         if(userService.verifyToken(authRequest.getEmail(), authRequest.getAuthToken())){
             return ResponseEntity.ok().body("{\"response\":\"authenticated\"}");
+        }
+        return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
+    }
+    @PutMapping("/user/rating")
+    public ResponseEntity<Object> addRating(@RequestBody MovieRatingRequest movieRatingRequest) {
+        if(userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())){
+            int userId = userRepo.findByEmail(movieRatingRequest.getEmail()).get(0).getId();
+            return ratingService.rateMovie(new MovieRating(movieRatingRequest.getMovie_id(),userId,movieRatingRequest.getRating()));
         }
         return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
     }

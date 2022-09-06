@@ -8,16 +8,16 @@ public class MovieRating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int event_id;
-    @Id
-    private int movie_id;
-    @Id
-    private int user_id;
+    @Column(name = "movie_id")
+    private String movieId;
+    @Column(name = "user_id")
+    private int userId;
     private int rating;
 
-    public MovieRating(int movie_id, int user_id,int rating){
+    public MovieRating(String movie_id, int user_id,int rating){
 
-        this.movie_id = movie_id;
-        this.user_id = user_id;
+        this.movieId = movie_id;
+        this.userId = user_id;
         this.rating = rating;
     }
 
@@ -33,20 +33,20 @@ public class MovieRating {
         this.rating = rating;
     }
 
-    public int getUser_id() {
-        return this.user_id;
+    public int getUserId() {
+        return this.userId;
     }
 
-    public void setUser_id(final int user_id) {
-        this.user_id = user_id;
+    public void setUserId(final int user_id) {
+        this.userId = user_id;
     }
 
-    public int getMovie_id() {
-        return this.movie_id;
+    public String getMovieId() {
+        return this.movieId;
     }
 
-    public void setMovie_id(final int movie_id) {
-        this.movie_id = movie_id;
+    public void setMovieId(final String movie_id) {
+        this.movieId = movie_id;
     }
 
 }

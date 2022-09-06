@@ -60,4 +60,12 @@ public class UserEntry {
         object.put("password",this.password);
         return object.toString();
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
