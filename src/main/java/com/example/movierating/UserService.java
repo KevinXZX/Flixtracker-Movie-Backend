@@ -46,13 +46,15 @@ public class UserService {
         if(userRepo.findByEmail(userEntry.getEmail()).isEmpty()){
             return ResponseEntity.status(404).body("Account does not exist");
         }
-        final String correctPassword = userRepo.findByEmail(userEntry.getEmail()).get(0).getPassword();
+        UserEntry user = userRepo.findByEmail(userEntry.getEmail()).get(0);
+        final String correctPassword = user.getPassword();
         if(encoder.matches(userEntry.getPassword(), correctPassword) ){
             byte[] randomBytes = new byte[64];
             secureRandom.nextBytes(randomBytes);
             tokenInMemoryRepo.addToken(userEntry.getEmail(),base64Encoder.encodeToString(randomBytes));
             HashMap<String, String> map = new HashMap<>();
             map.put("access_token",base64Encoder.encodeToString(randomBytes));
+            map.put("user_id",String.valueOf(user.getId()));
             return ResponseEntity.ok(map);
         }
         HashMap<String, String> map = new HashMap<>();
