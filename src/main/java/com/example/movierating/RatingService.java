@@ -23,5 +23,10 @@ public class RatingService {
         }
         return ResponseEntity.ok().body("{\"response\":\"success\"}");
     }
+    public ResponseEntity<Object> getRatings(int user_id) {
+        List<MovieRating> ratings = ratingRepo.findByUserId(user_id);
+
+        return ResponseEntity.ok(ratings);
+    }
 
 }

@@ -49,6 +49,11 @@ public class ResourceController {
         }
         return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
     }
+
+    @GetMapping("/user/rating/{user_id}")
+    public ResponseEntity<Object> getRating(@PathVariable("user_id") int user_id) {
+        return ratingService.getRatings(user_id);
+    }
 //    @PutMapping("/user")
 //    public ResponseEntity<Object>
 }
