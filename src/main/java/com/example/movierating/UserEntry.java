@@ -9,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class User {
+public class UserEntry {
     @NotNull
     private String name;
     @NotNull
@@ -19,13 +19,13 @@ public class User {
     private int id;
     @NotNull
     private String password;
-    public User(String name,String email,String password){
+    public UserEntry(String name, String email, String password){
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public User() {
+    public UserEntry() {
 
     }
 

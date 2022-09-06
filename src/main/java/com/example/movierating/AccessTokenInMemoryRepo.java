@@ -16,7 +16,7 @@ public class AccessTokenInMemoryRepo {
         }else{
             List<String> accessTokenList= new LinkedList<>();
             accessTokenList.add(token);
-            System.out.println("New user token list: "+user+" : "+token);
+            //System.out.println("New user token list: "+user+" : "+token);
             map.put(user,accessTokenList);
         }
     }

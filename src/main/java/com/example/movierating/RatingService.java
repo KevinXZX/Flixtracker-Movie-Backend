@@ -9,7 +9,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 @Service
-public class UserService {
+public class RatingService {
 
     @Autowired
     UserRepo userRepo;
@@ -38,7 +38,7 @@ public class UserService {
     }
 
     public ResponseEntity<Object> login(UserEntry userEntry){
-        if(userRepo.findByEmail(userEntry.getEmail()).isEmpty()){
+        if(userRepo.findByEmail(userEntry.getEmail()).size()==0){
             return ResponseEntity.status(404).body("Account does not exist");
         }
         String correctPassword = userRepo.findByEmail(userEntry.getEmail()).get(0).getPassword();

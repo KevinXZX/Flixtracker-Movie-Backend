@@ -9,8 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @AutoConfiguration
 
 public class MovieRatingApplication {
-    @Autowired
-    DatabaseRepo databaseRepo;
     public static void main(String[] args)
     {
         SpringApplication.run(MovieRatingApplication.class, args);

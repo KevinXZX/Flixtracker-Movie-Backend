@@ -18,13 +18,13 @@ public class ResourceController {
     UserRepo userRepo;
 
     @PostMapping("/user/register")
-    public ResponseEntity<Object> register(@RequestBody User newUser) {
-        return userService.register(newUser);
+    public ResponseEntity<Object> register(@RequestBody UserEntry newUserEntry) {
+        return userService.register(newUserEntry);
     }
 
     @GetMapping("/user/login")
-    public ResponseEntity<Object> login(@RequestBody User user) {
-        return userService.login(user);
+    public ResponseEntity<Object> login(@RequestBody UserEntry userEntry) {
+        return userService.login(userEntry);
     }
     @GetMapping("/greeting")
     public ResponseEntity<Object> greeting() {
