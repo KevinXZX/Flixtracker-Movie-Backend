@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.HashMap;
 
 @Service
 public class UserService {
@@ -27,14 +28,18 @@ public class UserService {
     }
 
     public ResponseEntity<Object> register(UserEntry newUserEntry){
+        HashMap<String, String> map = new HashMap<>();
         if(userRepo.findByName(newUserEntry.getName()).size()!=0){
-            return ResponseEntity.status(409).body("Name already used");
+            map.put("response","Name already used");
+            return ResponseEntity.status(409).body(map);
         }else if( userRepo.findByEmail(newUserEntry.getEmail()).size()!=0){
-            return ResponseEntity.status(409).body("Email already used");
+            map.put("response","Email already used");
+            return ResponseEntity.status(409).body(map);
         }
         newUserEntry.setPassword(generateHash(newUserEntry.getPassword()));
         userRepo.save(newUserEntry);
-        return ResponseEntity.ok().body("User created");
+        map.put("response","User created");
+        return ResponseEntity.ok(map);
     }
 
     public ResponseEntity<Object> login(UserEntry userEntry){
@@ -46,9 +51,13 @@ public class UserService {
             byte[] randomBytes = new byte[64];
             secureRandom.nextBytes(randomBytes);
             tokenInMemoryRepo.addToken(userEntry.getEmail(),base64Encoder.encodeToString(randomBytes));
-            return ResponseEntity.ok().body("{\"access_token\":"+base64Encoder.encodeToString(randomBytes) +"}");
+            HashMap<String, String> map = new HashMap<>();
+            map.put("access_token",base64Encoder.encodeToString(randomBytes));
+            return ResponseEntity.ok(map);
         }
-        return ResponseEntity.ok().body("Incorrect password");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("response","Incorrect password");
+        return ResponseEntity.ok(map);
     }
 
     public boolean verifyToken(String email, String token){

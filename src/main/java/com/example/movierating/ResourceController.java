@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
@@ -32,7 +33,9 @@ public class ResourceController {
     }
     @GetMapping("/greeting")
     public ResponseEntity<Object> greeting() {
-        return ResponseEntity.ok().body("Hello");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("response","hello");
+        return ResponseEntity.ok(map);
     }
     @GetMapping("/user/welcome")
     public ResponseEntity<Object> authenticatedGreeting(@RequestBody AuthRequest authRequest) {
