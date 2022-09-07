@@ -13,6 +13,13 @@ public class MovieRatingRequest extends AuthRequest{
 
     }
 
+    /**
+     * Generates an authenticated request to add a movie rating
+     * @param email user's email
+     * @param authToken generated access token
+     * @param movie_id name of the movie
+     * @param rating rating given
+     */
     public MovieRatingRequest(String email,String authToken,String movie_id, int rating){
         super(email,authToken);
         this.movie_id = movie_id;

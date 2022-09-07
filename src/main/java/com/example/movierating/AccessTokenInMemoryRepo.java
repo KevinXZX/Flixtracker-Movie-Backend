@@ -10,6 +10,13 @@ public class AccessTokenInMemoryRepo {
     public AccessTokenInMemoryRepo(){
         this.map = new HashMap<>();
     }
+
+    /**
+     * Adds an access token to a given user.
+     *
+     * @param user the user's email
+     * @param token the generated access token
+     */
     public void addToken(String user,String token){
         if(map.containsKey(user)){
             map.get(user).add(token);
@@ -20,11 +27,14 @@ public class AccessTokenInMemoryRepo {
             map.put(user,accessTokenList);
         }
     }
+
+    /**
+     * @param user the user's email
+     * @param token the generated access token
+     * @return if the token is associated with the user
+     */
     public boolean verifyToken(String user,String token){
         if(this.map.containsKey(user)){
-            for(String x: map.get(user)){
-                System.out.println(x);
-            }
             return this.map.get(user).contains(token);
         }
         return false;

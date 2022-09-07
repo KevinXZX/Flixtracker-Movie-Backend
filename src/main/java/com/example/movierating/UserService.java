@@ -19,6 +19,12 @@ public class UserService {
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder(); //threadsafe
     private final AccessTokenInMemoryRepo tokenInMemoryRepo = new AccessTokenInMemoryRepo();
 
+    /**
+     * Encrypts a password with BCrypt encryption
+     *
+     * @param password plaintext password
+     * @return hashed version of the password
+     */
     public static String generateHash(String password){
         return encoder.encode(password);
     }
@@ -27,6 +33,10 @@ public class UserService {
         return encoder.matches(incPassword,dbPassword);
     }
 
+    /**
+     * @param newUserEntry user to be registered
+     * @return JSON of whether the registration was successful
+     */
     public ResponseEntity<Object> register(UserEntry newUserEntry){
         HashMap<String, String> map = new HashMap<>();
         if(userRepo.findByName(newUserEntry.getName()).size()!=0){
@@ -42,6 +52,10 @@ public class UserService {
         return ResponseEntity.ok(map);
     }
 
+    /**
+     * @param userEntry user who wishes to log in
+     * @return JSON object of whether the user logged in successfully
+     */
     public ResponseEntity<Object> login(UserEntry userEntry){
         if(userRepo.findByEmail(userEntry.getEmail()).isEmpty()){
             return ResponseEntity.status(404).body("Account does not exist");
@@ -62,6 +76,11 @@ public class UserService {
         return ResponseEntity.ok(map);
     }
 
+    /**
+     * @param email email of the user
+     * @param token access token
+     * @return if the token is associated with that email
+     */
     public boolean verifyToken(String email, String token){
         return tokenInMemoryRepo.verifyToken(email,token);
     }

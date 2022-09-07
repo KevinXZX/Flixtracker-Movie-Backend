@@ -19,6 +19,14 @@ public class UserEntry {
     private int id;
     @NotNull
     private String password;
+
+    /**
+     * Represents a user entry
+     *
+     * @param name name of the user
+     * @param email email of the user
+     * @param password password of the user
+     */
     public UserEntry(String name, String email, String password){
         this.name = name;
         this.email = email;

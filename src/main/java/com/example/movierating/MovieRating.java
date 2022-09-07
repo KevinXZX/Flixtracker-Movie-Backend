@@ -14,6 +14,13 @@ public class MovieRating {
     private int userId;
     private int rating;
 
+    /**
+     * Constructs a MovieRating object
+     *
+     * @param movie_id the name of the movie
+     * @param user_id the id of the user
+     * @param rating the rating given
+     */
     public MovieRating(String movie_id, int user_id,int rating){
 
         this.movieId = movie_id;

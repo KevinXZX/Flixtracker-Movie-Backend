@@ -19,6 +19,11 @@ public class AuthRequest {
     private String authToken;
     private Long id;
 
+    /**
+     * Constructs an authentication request
+     * @param email user's email
+     * @param authToken generated access token
+     */
     public AuthRequest(String email,String authToken){
         this.email = email;
         this.authToken = authToken;
