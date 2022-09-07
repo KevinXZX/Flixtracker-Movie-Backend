@@ -9,4 +9,5 @@ import java.util.List;
 public interface RatingRepo extends JpaRepository<MovieRating, Integer> {
     List<MovieRating> findByMovieIdAndUserId(String movie_id, int user_id);
     List<MovieRating> findByUserId(int user_id);
+    long deleteAllByMovieIdAndUserId(String movie_id, int user_id);
 }

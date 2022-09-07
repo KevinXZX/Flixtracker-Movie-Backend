@@ -19,6 +19,12 @@ public class MovieRatingRequest extends AuthRequest{
         this.rating = rating;
     }
 
+    public MovieRatingRequest(String email,String authToken,String movie_id){
+        super(email,authToken);
+        this.movie_id = movie_id;
+        this.rating = 0;
+    }
+
     public String getMovie_id() {
         return movie_id;
     }

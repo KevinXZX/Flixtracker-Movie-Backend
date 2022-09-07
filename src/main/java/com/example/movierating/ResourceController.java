@@ -53,6 +53,15 @@ public class ResourceController {
         return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
     }
 
+    @DeleteMapping("/user/rating")
+    public ResponseEntity<Object> deleteRating(@RequestBody MovieRatingRequest movieRatingRequest) {
+        if(userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())){
+            int userId = userRepo.findByEmail(movieRatingRequest.getEmail()).get(0).getId();
+            return ratingService.deleteRating(new MovieRating(movieRatingRequest.getMovie_id(),userId,movieRatingRequest.getRating()));
+        }
+        return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
+    }
+
     @GetMapping("/user/rating/{user_id}")
     public ResponseEntity<Object> getRating(@PathVariable("user_id") int user_id) {
         return ratingService.getRatings(user_id);
