@@ -5,6 +5,9 @@ the React SPA app https://github.com/KevinXZX/React-Movie-Frontend . It is built
 with Java 17.  
 
 This REST API facilitates CRUD operations on a PostgreSQL database to save user
-information and movie ratings. 
+information and movie ratings. The API supports user authentication and registration. All passwords are 
+stored as bcrypt hashes. 
+
+
 
 
