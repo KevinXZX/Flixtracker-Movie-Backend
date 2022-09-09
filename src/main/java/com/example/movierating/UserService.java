@@ -48,7 +48,12 @@ public class UserService {
         }
         newUserEntry.setPassword(generateHash(newUserEntry.getPassword()));
         userRepo.save(newUserEntry);
+        byte[] randomBytes = new byte[64];
+        secureRandom.nextBytes(randomBytes);
+        tokenInMemoryRepo.addToken(newUserEntry.getEmail(),base64Encoder.encodeToString(randomBytes));
         map.put("response","User created");
+        map.put("access_token",base64Encoder.encodeToString(randomBytes));
+        map.put("user_id",String.valueOf(newUserEntry.getId()));
         return ResponseEntity.ok(map);
     }
 
