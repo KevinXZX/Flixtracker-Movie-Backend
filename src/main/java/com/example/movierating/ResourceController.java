@@ -36,7 +36,7 @@ public class ResourceController {
      * @param userEntry the user who wishes to login
      * @return JSON object that shows the status of the login
      */
-    @GetMapping("/user/login")
+    @PostMapping("/user/login")
     public ResponseEntity<Object> login(@RequestBody UserEntry userEntry) {
         return userService.login(userEntry);
     }
