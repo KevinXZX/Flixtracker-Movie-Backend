@@ -74,6 +74,7 @@ public class UserService {
             HashMap<String, String> map = new HashMap<>();
             map.put("access_token",base64Encoder.encodeToString(randomBytes));
             map.put("user_id",String.valueOf(user.getId()));
+            map.put("username",String.valueOf(user.getName()));
             return ResponseEntity.ok(map);
         }
         HashMap<String, String> map = new HashMap<>();
