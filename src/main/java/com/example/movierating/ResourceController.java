@@ -59,7 +59,7 @@ public class ResourceController {
      * @param authRequest request to be authenticated
      * @return JSON object that shows whether the authentication was successful
      */
-    @GetMapping("/user/welcome")
+    @PostMapping("/user/welcome")
     public ResponseEntity<Object> authenticatedGreeting(@RequestBody AuthRequest authRequest) {
         if(userService.verifyToken(authRequest.getEmail(), authRequest.getAuthToken())){
             return ResponseEntity.ok().body("{\"response\":\"authenticated\"}");
