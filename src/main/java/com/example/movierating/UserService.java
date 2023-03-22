@@ -1,10 +1,13 @@
 package com.example.movierating;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
@@ -48,13 +51,21 @@ public class UserService {
         }
         newUserEntry.setPassword(generateHash(newUserEntry.getPassword()));
         userRepo.save(newUserEntry);
+        //TODO: Replace with JWT
         byte[] randomBytes = new byte[64];
         secureRandom.nextBytes(randomBytes);
         tokenInMemoryRepo.addToken(newUserEntry.getEmail(),base64Encoder.encodeToString(randomBytes));
+        //
+        Cookie authCookie = new Cookie("flix_auth_token",base64Encoder.encodeToString(randomBytes));
+        authCookie.setHttpOnly(true);
+        authCookie.setSecure(true);
+
         map.put("response","User created");
         map.put("access_token",base64Encoder.encodeToString(randomBytes));
         map.put("user_id",String.valueOf(newUserEntry.getId()));
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE,authCookie.toString())
+                .body(map);
     }
 
     /**
@@ -71,11 +82,16 @@ public class UserService {
             byte[] randomBytes = new byte[64];
             secureRandom.nextBytes(randomBytes);
             tokenInMemoryRepo.addToken(userEntry.getEmail(),base64Encoder.encodeToString(randomBytes));
+            Cookie authCookie = new Cookie("flix_auth_token",base64Encoder.encodeToString(randomBytes));
+            authCookie.setHttpOnly(true);
+            authCookie.setSecure(true);
             HashMap<String, String> map = new HashMap<>();
             map.put("access_token",base64Encoder.encodeToString(randomBytes));
             map.put("user_id",String.valueOf(user.getId()));
             map.put("username",String.valueOf(user.getName()));
-            return ResponseEntity.ok(map);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE,authCookie.toString())
+                    .body(map);
         }
         HashMap<String, String> map = new HashMap<>();
         map.put("response","Incorrect password");

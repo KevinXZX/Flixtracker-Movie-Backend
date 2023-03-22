@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/v1/")
 public class ResourceController {
     private static final String FAILED_AUTH_ERROR = "{\"response\":\"incorrect_access_token\"}";
