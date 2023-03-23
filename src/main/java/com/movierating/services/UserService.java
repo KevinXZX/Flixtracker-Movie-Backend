@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
@@ -59,9 +58,11 @@ public class UserService {
         secureRandom.nextBytes(randomBytes);
         tokenInMemoryRepo.addToken(newUserEntry.getEmail(), base64Encoder.encodeToString(randomBytes));
         //
-        Cookie authCookie = new Cookie("flix_auth_token", base64Encoder.encodeToString(randomBytes));
-        authCookie.setHttpOnly(true);
-        authCookie.setSecure(true);
+        ResponseCookie authCookie = ResponseCookie.from("flix_auth_token", base64Encoder.encodeToString(randomBytes)) // key & value
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")  // sameSite
+                .build();
 
         map.put("response", "User created");
         map.put("access_token", base64Encoder.encodeToString(randomBytes));
