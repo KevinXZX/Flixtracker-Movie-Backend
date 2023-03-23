@@ -1,5 +1,7 @@
-package com.example.movierating;
+package com.movierating.services;
 
+import com.movierating.obj.MovieRating;
+import com.movierating.repo.RatingRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,7 @@ public class RatingService {
      */
     public ResponseEntity<Object> rateMovie(MovieRating movieRating) {
         List<MovieRating> ratings = ratingRepo.findByMovieIdAndUserId(movieRating.getMovieId(), movieRating.getUserId());
-        if (ratings.isEmpty() ||ratings.get(0) == null) {
+        if (ratings.isEmpty() || ratings.get(0) == null) {
             //Create new rating
             ratingRepo.save(movieRating);
         } else {

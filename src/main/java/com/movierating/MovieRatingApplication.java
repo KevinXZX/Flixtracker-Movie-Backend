@@ -1,4 +1,4 @@
-package com.example.movierating;
+package com.movierating;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -8,10 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @AutoConfiguration
 
 public class MovieRatingApplication {
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         SpringApplication.run(MovieRatingApplication.class, args);
     }
 
-  
+
 }

@@ -1,11 +1,8 @@
-package com.example.movierating;
+package com.movierating.obj.requests;
 
 import com.sun.istack.NotNull;
-import org.json.JSONObject;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
@@ -14,17 +11,17 @@ public class AuthRequest {
     private String email;
 
 
-
     @NotNull
     private String authToken;
     private Long id;
 
     /**
      * Constructs an authentication request
-     * @param email user's email
+     *
+     * @param email     user's email
      * @param authToken generated access token
      */
-    public AuthRequest(String email,String authToken){
+    public AuthRequest(String email, String authToken) {
         this.email = email;
         this.authToken = authToken;
     }
@@ -49,6 +46,7 @@ public class AuthRequest {
     public Long getId() {
         return id;
     }
+
     public String getAuthToken() {
         return this.authToken;
     }

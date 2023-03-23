@@ -1,5 +1,6 @@
-package com.example.movierating;
+package com.movierating.repo;
 
+import com.movierating.obj.MovieRating;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

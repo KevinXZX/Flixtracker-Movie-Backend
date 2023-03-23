@@ -1,4 +1,4 @@
-package com.example.movierating;
+package com.movierating.obj;
 
 import javax.persistence.*;
 
@@ -18,10 +18,10 @@ public class MovieRating {
      * Constructs a MovieRating object
      *
      * @param movie_id the name of the movie
-     * @param user_id the id of the user
-     * @param rating the rating given
+     * @param user_id  the id of the user
+     * @param rating   the rating given
      */
-    public MovieRating(String movie_id, int user_id,int rating){
+    public MovieRating(String movie_id, int user_id, int rating) {
 
         this.movieId = movie_id;
         this.userId = user_id;

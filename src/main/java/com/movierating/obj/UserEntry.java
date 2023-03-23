@@ -1,4 +1,4 @@
-package com.example.movierating;
+package com.movierating.obj;
 
 import com.sun.istack.NotNull;
 import org.json.JSONObject;
@@ -23,11 +23,11 @@ public class UserEntry {
     /**
      * Represents a user entry
      *
-     * @param name name of the user
-     * @param email email of the user
+     * @param name     name of the user
+     * @param email    email of the user
      * @param password password of the user
      */
-    public UserEntry(String name, String email, String password){
+    public UserEntry(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -60,12 +60,13 @@ public class UserEntry {
     public void setName(final String name) {
         this.name = name;
     }
+
     @Override
     public String toString() {
         JSONObject object = new JSONObject();
-        object.put("name",this.name);
-        object.put("email",this.email);
-        object.put("password",this.password);
+        object.put("name", this.name);
+        object.put("email", this.email);
+        object.put("password", this.password);
         return object.toString();
     }
 

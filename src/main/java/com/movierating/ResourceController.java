@@ -1,11 +1,17 @@
-package com.example.movierating;
+package com.movierating;
 
+import com.movierating.obj.MovieRating;
+import com.movierating.obj.UserEntry;
+import com.movierating.obj.requests.AuthRequest;
+import com.movierating.obj.requests.MovieRatingRequest;
+import com.movierating.repo.UserRepo;
+import com.movierating.services.RatingService;
+import com.movierating.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -48,7 +54,7 @@ public class ResourceController {
     @GetMapping("/greeting")
     public ResponseEntity<Object> greeting() {
         HashMap<String, String> map = new HashMap<>();
-        map.put("response","hello");
+        map.put("response", "hello");
         return ResponseEntity.ok(map);
     }
 
@@ -60,7 +66,7 @@ public class ResourceController {
      */
     @PostMapping("/user/welcome")
     public ResponseEntity<Object> authenticatedGreeting(@RequestBody AuthRequest authRequest) {
-        if(userService.verifyToken(authRequest.getEmail(), authRequest.getAuthToken())){
+        if (userService.verifyToken(authRequest.getEmail(), authRequest.getAuthToken())) {
             return ResponseEntity.ok().body("{\"response\":\"authenticated\"}");
         }
         return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
@@ -74,9 +80,9 @@ public class ResourceController {
      */
     @PutMapping("/user/rating")
     public ResponseEntity<Object> addRating(@RequestBody MovieRatingRequest movieRatingRequest) {
-        if(userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())){
+        if (userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())) {
             int userId = userRepo.findByEmail(movieRatingRequest.getEmail()).get(0).getId();
-            return ratingService.rateMovie(new MovieRating(movieRatingRequest.getMovie_id(),userId,movieRatingRequest.getRating()));
+            return ratingService.rateMovie(new MovieRating(movieRatingRequest.getMovie_id(), userId, movieRatingRequest.getRating()));
         }
         return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
     }
@@ -89,9 +95,9 @@ public class ResourceController {
      */
     @DeleteMapping("/user/rating")
     public ResponseEntity<Object> deleteRating(@RequestBody MovieRatingRequest movieRatingRequest) {
-        if(userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())){
+        if (userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())) {
             int userId = userRepo.findByEmail(movieRatingRequest.getEmail()).get(0).getId();
-            return ratingService.deleteRating(new MovieRating(movieRatingRequest.getMovie_id(),userId,movieRatingRequest.getRating()));
+            return ratingService.deleteRating(new MovieRating(movieRatingRequest.getMovie_id(), userId, movieRatingRequest.getRating()));
         }
         return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
     }
