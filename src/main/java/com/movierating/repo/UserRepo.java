@@ -26,5 +26,4 @@ public interface UserRepo extends JpaRepository<UserEntry, Integer> {
      */
     List<UserEntry> findById(String id);
 
-
 }

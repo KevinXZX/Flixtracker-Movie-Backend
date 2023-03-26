@@ -1,10 +1,11 @@
 package com.movierating.services;
 
-import com.movierating.AccessTokenInMemoryRepo;
+import com.movierating.helpers.JwtTokenUtil;
 import com.movierating.obj.UserEntry;
 import com.movierating.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,11 +19,13 @@ import java.util.HashMap;
 public class UserService {
 
     @Autowired
-    UserRepo userRepo;
+    private UserRepo userRepo;
     static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private static final SecureRandom secureRandom = new SecureRandom(); //threadsafe
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder(); //threadsafe
-    private final AccessTokenInMemoryRepo tokenInMemoryRepo = new AccessTokenInMemoryRepo();
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     /**
      * Encrypts a password with BCrypt encryption
@@ -53,20 +56,14 @@ public class UserService {
         }
         newUserEntry.setPassword(generateHash(newUserEntry.getPassword()));
         userRepo.save(newUserEntry);
-        //TODO: Replace with JWT
-        byte[] randomBytes = new byte[64];
-        secureRandom.nextBytes(randomBytes);
-        tokenInMemoryRepo.addToken(newUserEntry.getEmail(), base64Encoder.encodeToString(randomBytes));
-        //
-        ResponseCookie authCookie = ResponseCookie.from("flix_auth_token", base64Encoder.encodeToString(randomBytes)) // key & value
+        UserEntry user = userRepo.findByEmail(newUserEntry.getEmail()).get(0);
+        String token = jwtTokenUtil.createToken(user.getId());
+        ResponseCookie authCookie = ResponseCookie.from("flix_auth_token", token) // key & value
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")  // sameSite
                 .build();
-
-        map.put("response", "User created");
-        map.put("access_token", base64Encoder.encodeToString(randomBytes));
-        map.put("user_id", String.valueOf(newUserEntry.getId()));
+        map.put("username", String.valueOf(user.getName()));
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authCookie.toString())
                 .body(map);
@@ -78,39 +75,32 @@ public class UserService {
      */
     public ResponseEntity<Object> login(UserEntry userEntry) {
         if (userRepo.findByEmail(userEntry.getEmail()).isEmpty()) {
-            return ResponseEntity.status(404).body("Account does not exist");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect Account Details");
         }
         UserEntry user = userRepo.findByEmail(userEntry.getEmail()).get(0);
         final String correctPassword = user.getPassword();
         if (encoder.matches(userEntry.getPassword(), correctPassword)) {
-            byte[] randomBytes = new byte[64];
-            secureRandom.nextBytes(randomBytes);
-            tokenInMemoryRepo.addToken(userEntry.getEmail(), base64Encoder.encodeToString(randomBytes));
-            ResponseCookie authCookie = ResponseCookie.from("flix_auth_token", base64Encoder.encodeToString(randomBytes)) // key & value
+            ResponseCookie authCookie = ResponseCookie.from("flix_auth_token",
+                            jwtTokenUtil.createToken(user.getId()))
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("Lax")  // sameSite
                     .build();
             HashMap<String, String> map = new HashMap<>();
-            map.put("access_token", base64Encoder.encodeToString(randomBytes));
-            map.put("user_id", String.valueOf(user.getId()));
             map.put("username", String.valueOf(user.getName()));
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, authCookie.toString())
                     .body(map);
         }
-        HashMap<String, String> map = new HashMap<>();
-        map.put("response", "Incorrect password");
-        return ResponseEntity.ok(map);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect Account Details");
     }
 
-    /**
-     * @param email email of the user
-     * @param token access token
-     * @return if the token is associated with that email
-     */
-    public boolean verifyToken(String email, String token) {
-        return tokenInMemoryRepo.verifyToken(email, token);
+    public boolean userExists(int id) {
+        return userRepo.findById(id) != null;
+    }
+
+    public UserEntry findUserByUsername(String username) {
+        return userRepo.findByName(username).get(0);
     }
 
 }

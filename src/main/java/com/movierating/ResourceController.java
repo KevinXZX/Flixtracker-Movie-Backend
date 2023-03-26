@@ -2,7 +2,6 @@ package com.movierating;
 
 import com.movierating.obj.MovieRating;
 import com.movierating.obj.UserEntry;
-import com.movierating.obj.requests.AuthRequest;
 import com.movierating.obj.requests.MovieRatingRequest;
 import com.movierating.repo.UserRepo;
 import com.movierating.services.RatingService;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
 @RestController
@@ -61,15 +61,11 @@ public class ResourceController {
     /**
      * REST endpoint to verify the authentication token
      *
-     * @param authRequest request to be authenticated
      * @return JSON object that shows whether the authentication was successful
      */
     @PostMapping("/user/welcome")
-    public ResponseEntity<Object> authenticatedGreeting(@RequestBody AuthRequest authRequest) {
-        if (userService.verifyToken(authRequest.getEmail(), authRequest.getAuthToken())) {
-            return ResponseEntity.ok().body("{\"response\":\"authenticated\"}");
-        }
-        return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
+    public ResponseEntity<Object> authenticatedGreeting() {
+        return ResponseEntity.ok().body("{\"response\":\"authenticated\"}");
     }
 
     /**
@@ -79,12 +75,9 @@ public class ResourceController {
      * @return whether the adding/editing of a movie rating was successful
      */
     @PutMapping("/user/rating")
-    public ResponseEntity<Object> addRating(@RequestBody MovieRatingRequest movieRatingRequest) {
-        if (userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())) {
-            int userId = userRepo.findByEmail(movieRatingRequest.getEmail()).get(0).getId();
-            return ratingService.rateMovie(new MovieRating(movieRatingRequest.getMovie_id(), userId, movieRatingRequest.getRating()));
-        }
-        return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
+    public ResponseEntity<Object> addRating(@RequestBody MovieRatingRequest movieRatingRequest, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("user_id");
+        return ratingService.rateMovie(new MovieRating(movieRatingRequest.getMovie_id(), userId, movieRatingRequest.getRating()));
     }
 
     /**
@@ -94,22 +87,20 @@ public class ResourceController {
      * @return JSON object that shows whether the deletionw as successful
      */
     @DeleteMapping("/user/rating")
-    public ResponseEntity<Object> deleteRating(@RequestBody MovieRatingRequest movieRatingRequest) {
-        if (userService.verifyToken(movieRatingRequest.getEmail(), movieRatingRequest.getAuthToken())) {
-            int userId = userRepo.findByEmail(movieRatingRequest.getEmail()).get(0).getId();
-            return ratingService.deleteRating(new MovieRating(movieRatingRequest.getMovie_id(), userId, movieRatingRequest.getRating()));
-        }
-        return ResponseEntity.ok().body(FAILED_AUTH_ERROR);
+    public ResponseEntity<Object> deleteRating(@RequestBody MovieRatingRequest movieRatingRequest, HttpServletRequest request) {
+        int userId = (int) request.getAttribute("user_id");
+        return ratingService.deleteRating(new MovieRating(movieRatingRequest.getMovie_id(), userId, movieRatingRequest.getRating()));
     }
 
     /**
      * REST endpoint to access movie ratings for the given user id
      *
-     * @param user_id id of the user
+     * @param username of the user
      * @return JSON array of all ratings for the user
      */
-    @GetMapping("/user/rating/{user_id}")
-    public ResponseEntity<Object> getRating(@PathVariable("user_id") int user_id) {
+    @GetMapping("/user/rating/{user_name}")
+    public ResponseEntity<Object> getRating(@PathVariable("user_name") String username) {
+        int user_id = userService.findUserByUsername(username).getId();
         return ratingService.getRatings(user_id);
     }
 //    @PutMapping("/user")
