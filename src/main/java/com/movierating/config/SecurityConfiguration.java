@@ -12,24 +12,22 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors().and();
-        httpSecurity.csrf().disable();
-        httpSecurity.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
-        httpSecurity.authorizeRequests().anyRequest().permitAll();
-    }
+  @Override
+  protected void configure(HttpSecurity httpSecurity) throws Exception {
+    httpSecurity.cors().and();
+    httpSecurity.csrf().disable();
+    httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
+    httpSecurity.authorizeRequests().anyRequest().permitAll();
+  }
 
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("https://flixtracker.arcanecat.com");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        CorsConfigurationSource source = request -> config;
-        return new CorsFilter(source);
-    }
+  @Bean
+  public CorsFilter corsFilter() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.addAllowedOrigin("https://flixtracker.arcanecat.com");
+    config.addAllowedHeader("*");
+    config.addAllowedMethod("*");
+    CorsConfigurationSource source = request -> config;
+    return new CorsFilter(source);
+  }
 }
