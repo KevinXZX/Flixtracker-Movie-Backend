@@ -3,8 +3,6 @@ package com.movierating.services;
 import com.movierating.helpers.JwtTokenUtil;
 import com.movierating.obj.UserEntry;
 import com.movierating.repo.UserRepo;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,9 +17,6 @@ public class UserService {
 
   @Autowired private UserRepo userRepo;
   static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-  private static final SecureRandom secureRandom = new SecureRandom(); // threadsafe
-  private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder(); // threadsafe
-
   @Autowired private JwtTokenUtil jwtTokenUtil;
 
   /**
@@ -34,8 +29,8 @@ public class UserService {
     return encoder.encode(password);
   }
 
-  public boolean validPassword(String dbPassword, String incPassword) {
-    return encoder.matches(incPassword, dbPassword);
+  public boolean matchesPassword(String dbPassword, String incPassword) {
+    return encoder.matches(dbPassword, incPassword);
   }
 
   /**
@@ -75,7 +70,7 @@ public class UserService {
     }
     UserEntry user = userRepo.findByEmail(userEntry.getEmail()).get(0);
     final String correctPassword = user.getPassword();
-    if (encoder.matches(userEntry.getPassword(), correctPassword)) {
+    if (matchesPassword(userEntry.getPassword(), correctPassword)) {
       ResponseCookie authCookie =
           ResponseCookie.from("flix_auth_token", jwtTokenUtil.createToken(user.getId()))
               .httpOnly(true)
@@ -90,7 +85,7 @@ public class UserService {
   }
 
   public boolean userExists(int id) {
-    return userRepo.findById(id) != null;
+    return userRepo.findById(id).isPresent();
   }
 
   public UserEntry findUserByUsername(String username) {
