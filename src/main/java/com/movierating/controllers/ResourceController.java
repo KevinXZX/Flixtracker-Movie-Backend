@@ -1,9 +1,8 @@
-package com.movierating;
+package com.movierating.controllers;
 
 import com.movierating.obj.MovieRating;
 import com.movierating.obj.UserEntry;
 import com.movierating.obj.requests.MovieRatingRequest;
-import com.movierating.repo.UserRepo;
 import com.movierating.services.RatingService;
 import com.movierating.services.UserService;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class ResourceController {
   @Autowired private UserService userService;
   @Autowired private RatingService ratingService;
-  @Autowired private UserRepo userRepo;
 
   /**
    * REST endpoint to register accounts
