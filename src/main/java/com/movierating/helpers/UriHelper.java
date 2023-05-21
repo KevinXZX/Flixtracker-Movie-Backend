@@ -20,6 +20,9 @@ public class UriHelper {
     if (uri.startsWith("/api/v1/user/rating/")) {
       return true;
     }
+    if(uri.startsWith("/proxy/")){
+        return true;
+    }
     return publicPaths.contains(uri);
   }
 }
