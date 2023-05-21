@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class JwtTokenUtil {
   private final Algorithm algo;
 
-  public JwtTokenUtil(@Value("jwt.secret") String secret) {
+  public JwtTokenUtil(@Value("${jwt.secret}") String secret) {
     algo = Algorithm.HMAC256(secret);
   }
 
