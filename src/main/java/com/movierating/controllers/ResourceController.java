@@ -100,6 +100,4 @@ public class ResourceController {
     int user_id = userService.findUserByUsername(username).getId();
     return ratingService.getRatings(user_id);
   }
-  //    @PutMapping("/user")
-  //    public ResponseEntity<Object>
 }
