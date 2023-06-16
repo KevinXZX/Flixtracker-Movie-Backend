@@ -21,19 +21,20 @@ public class TmdbProxyService {
     }
 
     public ResponseEntity<String> getPopularMovies(){
-        return HttpGetTmdbRoute("/3/movie/popular","");
+        return TmdbGet("/3/movie/popular");
     }
     public ResponseEntity<String> getUpcomingMovies(){ //Specify region to ensure movies haven't premiered
-        return HttpGetTmdbRoute("/3/movie/upcoming","&region=US");
+        return TmdbGet("/3/movie/upcoming?region=US");
     }
     public ResponseEntity<String> searchMovie(String query){
-        return HttpGetTmdbRoute("/3/search/movie","&language=en-US&page=1&include_adult=false&query="+query);
+        return TmdbGet("/3/search/movie?language=en-US&page=1&include_adult=false&query="+query);
     }
 
     // TODO: Refactor into better signature than route
-    private ResponseEntity<String> HttpGetTmdbRoute(String route,String params){
-        String url = tmdbUrl + route + "?api_key=" + apiKey+params;
+    private ResponseEntity<String> TmdbGet(String route){
+        String url = tmdbUrl + route;
         Request request = new Request.Builder()
+                .addHeader(HttpHeaders.AUTHORIZATION,String.format("Bearer %s",apiKey))
                 .url(url)
                 .build();
         try (Response response = client.newCall(request).execute()) {
