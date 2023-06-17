@@ -3,6 +3,10 @@ package com.movierating.services;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
@@ -22,6 +26,7 @@ public class TmdbProxyService {
     private final String apiKey;
     private final LoadingCache<String,ResponseEntity<String>> dailyCache;
     private final LoadingCache<String,ResponseEntity<String>> searchCache;
+    private final Bucket apiRate;
 
     public TmdbProxyService(@Value("${tmdb.secret}") String apiKey){
         client = new OkHttpClient();
@@ -29,6 +34,9 @@ public class TmdbProxyService {
         // TODO: API limit - 35/second
         dailyCache = CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(24, TimeUnit.HOURS).build(createCacheLoader());
         searchCache = CacheBuilder.newBuilder().maximumSize(2000).expireAfterAccess(30, TimeUnit.MINUTES).build(createCacheLoader());
+        apiRate = Bucket.builder()
+                .addLimit(Bandwidth.classic(35, Refill.greedy(35, Duration.ofSeconds(1))))
+                .build();
     }
 
     public ResponseEntity<String> getPopularMovies(){
@@ -53,6 +61,9 @@ public class TmdbProxyService {
         }
     }
     private ResponseEntity<String> TmdbGet(String route){
+        if(!apiRate.tryConsume(1)){
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
+        }
         String url = tmdbUrl + route;
         Request request = new Request.Builder()
                 .addHeader(HttpHeaders.AUTHORIZATION,String.format("Bearer %s",apiKey))
