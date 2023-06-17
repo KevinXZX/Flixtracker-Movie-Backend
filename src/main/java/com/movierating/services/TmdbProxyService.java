@@ -1,5 +1,10 @@
 package com.movierating.services;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -15,22 +20,38 @@ public class TmdbProxyService {
     private final OkHttpClient client;
     private final String tmdbUrl = "https://api.themoviedb.org";
     private final String apiKey;
+    private LoadingCache<String,ResponseEntity> dailyCache;
+    private LoadingCache<String,ResponseEntity> searchCache;
+
     public TmdbProxyService(@Value("${tmdb.secret}") String apiKey){
         client = new OkHttpClient();
         this.apiKey = apiKey;
+        // TODO: API limit - 35/second
+        dailyCache = CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(24, TimeUnit.HOURS).build(createCacheLoader());
+        searchCache = CacheBuilder.newBuilder().maximumSize(2000).expireAfterAccess(30, TimeUnit.MINUTES).build(createCacheLoader());
     }
 
-    public ResponseEntity<String> getPopularMovies(){
-        return TmdbGet("/3/movie/popular");
+    public ResponseEntity getPopularMovies(){
+        return fetchFromCache("/3/movie/popular",dailyCache);
     }
     public ResponseEntity<String> getUpcomingMovies(){ //Specify region to ensure movies haven't premiered
-        return TmdbGet("/3/movie/upcoming?region=US");
+        return fetchFromCache("/3/movie/upcoming?region=US", dailyCache);
     }
     public ResponseEntity<String> searchMovie(String query){
-        return TmdbGet("/3/search/movie?language=en-US&page=1&include_adult=false&query="+query);
+        return fetchFromCache("/3/search/movie?language=en-US&page=1&include_adult=false&query="+query, searchCache);
     }
-
-    // TODO: Refactor into better signature than route
+    private ResponseEntity fetchFromCache(String route,LoadingCache<String,ResponseEntity> cache){
+        try{
+            return cache.get(route);
+        }catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if(cause instanceof RestException){
+                return ((RestException) cause).getResponse();
+            }else{
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
     private ResponseEntity<String> TmdbGet(String route){
         String url = tmdbUrl + route;
         Request request = new Request.Builder()
@@ -50,5 +71,31 @@ public class TmdbProxyService {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    private CacheLoader<String,ResponseEntity> createCacheLoader(){
+    return new CacheLoader<>() {
+      @Override
+      public ResponseEntity load(String route) throws RestException {
+        ResponseEntity response = TmdbGet(route);
+        if (response.getStatusCode() != HttpStatus.OK) {
+          throw new RestException(response, "Response did not return OK");
+        }
+        return response;
+      }
+    };
+    }
+
+}
+
+class RestException extends Exception{
+    private ResponseEntity response;
+
+    public RestException(ResponseEntity response, String message) {
+        super(message);
+        this.response = response;
+    }
+
+    public ResponseEntity getResponse() {
+        return response;
     }
 }
