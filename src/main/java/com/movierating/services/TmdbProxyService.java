@@ -20,8 +20,8 @@ public class TmdbProxyService {
     private final OkHttpClient client;
     private final String tmdbUrl = "https://api.themoviedb.org";
     private final String apiKey;
-    private LoadingCache<String,ResponseEntity> dailyCache;
-    private LoadingCache<String,ResponseEntity> searchCache;
+    private final LoadingCache<String,ResponseEntity<String>> dailyCache;
+    private final LoadingCache<String,ResponseEntity<String>> searchCache;
 
     public TmdbProxyService(@Value("${tmdb.secret}") String apiKey){
         client = new OkHttpClient();
@@ -31,7 +31,7 @@ public class TmdbProxyService {
         searchCache = CacheBuilder.newBuilder().maximumSize(2000).expireAfterAccess(30, TimeUnit.MINUTES).build(createCacheLoader());
     }
 
-    public ResponseEntity getPopularMovies(){
+    public ResponseEntity<String> getPopularMovies(){
         return fetchFromCache("/3/movie/popular",dailyCache);
     }
     public ResponseEntity<String> getUpcomingMovies(){ //Specify region to ensure movies haven't premiered
@@ -40,7 +40,7 @@ public class TmdbProxyService {
     public ResponseEntity<String> searchMovie(String query){
         return fetchFromCache("/3/search/movie?language=en-US&page=1&include_adult=false&query="+query, searchCache);
     }
-    private ResponseEntity fetchFromCache(String route,LoadingCache<String,ResponseEntity> cache){
+    private ResponseEntity<String> fetchFromCache(String route,LoadingCache<String,ResponseEntity<String>> cache){
         try{
             return cache.get(route);
         }catch (ExecutionException e) {
@@ -72,11 +72,11 @@ public class TmdbProxyService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    private CacheLoader<String,ResponseEntity> createCacheLoader(){
+    private CacheLoader<String,ResponseEntity<String>> createCacheLoader(){
     return new CacheLoader<>() {
       @Override
-      public ResponseEntity load(String route) throws RestException {
-        ResponseEntity response = TmdbGet(route);
+      public ResponseEntity<String> load(String route) throws RestException {
+        ResponseEntity<String> response = TmdbGet(route);
         if (response.getStatusCode() != HttpStatus.OK) {
           throw new RestException(response, "Response did not return OK");
         }
@@ -88,14 +88,14 @@ public class TmdbProxyService {
 }
 
 class RestException extends Exception{
-    private ResponseEntity response;
+    private final ResponseEntity<String> response;
 
-    public RestException(ResponseEntity response, String message) {
+    public RestException(ResponseEntity<String> response, String message) {
         super(message);
         this.response = response;
     }
 
-    public ResponseEntity getResponse() {
+    public ResponseEntity<String> getResponse() {
         return response;
     }
 }
